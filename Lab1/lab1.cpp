@@ -18,7 +18,8 @@ int main() {
 
     // main array：velocity, pressure, energy
     vector<double> velocity(numParticles), pressure(numParticles), energy(numParticles);
-    double start_time, end_time;
+    double start_time, end_time, total_start, total_end;
+    total_start = omp_get_wtime();
     start_time = omp_get_wtime();
     // init velocity and pressure
     #pragma omp parallel for
@@ -42,7 +43,6 @@ int main() {
     }
 
     end_time = omp_get_wtime();
-
 	printf("Second part Compute %f seconds\n", end_time - start_time);
     start_time = omp_get_wtime();
     double fieldSum = 0;
@@ -102,6 +102,9 @@ int main() {
     end_time = omp_get_wtime();
 
 	printf("Fifth Compute %f seconds\n", end_time - start_time);
+    total_end = omp_get_wtime();
+
+    printf("Total Compute %f seconds\n", total_end - total_start);
     // ------------------------
     cout << "=== result ===" << endl;
     // energy

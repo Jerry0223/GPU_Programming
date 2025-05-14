@@ -18,17 +18,22 @@ int main() {
 
     // main array：velocity, pressure, energy
     vector<double> velocity(numParticles), pressure(numParticles), energy(numParticles);
-
+    double start_time, end_time, total_start, total_end;
+    total_start = omp_get_wtime();
+    start_time = omp_get_wtime();
     // init velocity and pressure
     for (int i = 0; i < numParticles; i++) {
         velocity[i] = i * 1.0;
         pressure[i] = (numParticles - i) * 1.0;
     }
 
-
     for(int i = 0; i < numParticles; i++) {
         energy[i] = velocity[i] + pressure[i];
     }
+
+    end_time = omp_get_wtime();
+    printf("first part Compute %f seconds\n", end_time - start_time);
+    start_time = omp_get_wtime();
     for(int i = 0; i < numParticles; i++) {
         double work = 0.0;
         int loops = (i % 10) * 10 + 10; // 10, 20, ..., 100
@@ -39,13 +44,20 @@ int main() {
         velocity[i] = sin(energy[i]) + log(1 + fabs(work));
     }
 
+    end_time = omp_get_wtime();
+	printf("Second part Compute %f seconds\n", end_time - start_time);
+    start_time = omp_get_wtime();
+
     double fieldSum = 0;
     for(int r = 0; r < gridRows; r++) {
         for(int c = 0; c < gridCols; c++) {
             fieldSum += sqrt(r * 2.0) + log1p(c * 2.0);
         }
     }
+    end_time = omp_get_wtime();
 
+	printf("Third part Compute %f seconds\n", end_time - start_time);
+    start_time = omp_get_wtime();
     // ------------------------
     double atomicFlux = 0.0;
     for(int i = 0; i < numParticles; i++){
@@ -70,7 +82,10 @@ int main() {
         }
         
     }
+    end_time = omp_get_wtime();
 
+	printf("Forth part Compute %f seconds\n", end_time - start_time);
+    start_time = omp_get_wtime();
     // 6) print result to check correctness
     // ------------------------
     double sumVelocity = 0.0;
@@ -82,7 +97,12 @@ int main() {
         sumPressure += pressure[i];
         sumEnergy   += energy[i];
     }
+    end_time = omp_get_wtime();
 
+	printf("Fifth Compute %f seconds\n", end_time - start_time);
+    total_end = omp_get_wtime();
+
+    printf("Total Compute %f seconds\n", total_end - total_start);
     // ------------------------
     cout << "=== result ===" << endl;
     // energy
